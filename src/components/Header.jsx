@@ -6,12 +6,34 @@
  import { IoMdAddCircleOutline } from 'react-icons/io';
 import { HiCamera } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 
  export default function Header() {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imageFileUrl, setImageFileUrl] = useState(null);
+  const [imageFileUploading, setImageFileUploading] = useState(false);
+  const [postUploading, setPostUploading] = useState(false);
+  const [caption, setCaption] = useState('');
+  const filePickerRef = useRef(null);
+
+  function addImageToPost(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setImageFileUrl(URL.createObjectURL(file));
+      console.log(imageFileUrl);
+    }
+  }
+
+  useEffect(() => {
+    if (selectedFile) {
+     // uploadImageToStorage();
+    }
+  }, [selectedFile]);
+
 
   return (
     <div className='shadow-sm border-b sticky top-0 bg-white z-30 p-3'>
@@ -77,12 +99,29 @@ import { useState } from 'react';
           ariaHideApp={false}
         >
           <div className='flex flex-col justify-center items-center h-[100%]'>
-           
+
+          {selectedFile ? (
+              <img
+                onClick={() => setSelectedFile(null)}
+                src={imageFileUrl}
+                alt='selected file'
+                className={`w-full max-h-[250px] object-over cursor-pointer ${
+                  imageFileUploading ? 'animate-pulse' : ''
+                }`}
+              />
+            ) : (
               <HiCamera
                 onClick={() => filePickerRef.current.click()}
                 className='text-5xl text-gray-400 cursor-pointer'
-              />            
-            
+              />
+            )}
+            <input
+              hidden      
+              ref={filePickerRef}  
+              type='file'
+              accept='image/*'
+              onChange={addImageToPost}
+            />                   
           </div>
           <input
             type='text'
